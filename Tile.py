@@ -13,9 +13,11 @@ class EdgeType(Enum):
     WaterTrain = 6 # Omit first
 
 class Tile:
+
     def __init__(self, edges: List[EdgeType]) -> None:    
         if edges is not None:
-            self.edges = edges # Clockwise 
+            assert len(edges) == 6
+            self.edges = edges # Clockwise, starting with Up&Right
         else:
             self.edges: List[EdgeType] = []
             self.randomizeEdges()
