@@ -1,6 +1,6 @@
 from unittest import TestCase
-from Tile import Tile
-from World import World
+from tile import Tile
+from world import World
 
 class WorldTest(TestCase):
     

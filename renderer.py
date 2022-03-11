@@ -1,8 +1,8 @@
 import svgwrite
 from typing import List, Tuple
 
-from World import World
-from Tile import EdgeType
+from world import World
+from tile import EdgeType
 
 
 class Point:

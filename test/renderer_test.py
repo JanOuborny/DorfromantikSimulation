@@ -1,7 +1,7 @@
 from unittest import TestCase
 
-from World import World
-from Tile import Tile, EdgeType
+from world import World
+from tile import Tile, EdgeType
 from renderer import Renderer
 
 class MockWorldSmall(World):

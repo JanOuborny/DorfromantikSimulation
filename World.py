@@ -1,4 +1,4 @@
-from Tile import Tile
+from tile import Tile
 from typing import List, Set, Tuple
 
 class World:

@@ -1,5 +1,5 @@
 from unittest import TestCase
-from Tile import Tile
+from tile import Tile
 
 class TileTest(TestCase):
     
