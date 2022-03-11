@@ -43,11 +43,11 @@ class WorldTest(TestCase):
         result = world.getPossiblePlacements(grasTile)
 
         # Assert
-        expected = [(502, 501), (500, 501), (501, 500), (502, 500), (500, 502), (501, 502)]
+        expected = [(501, 500), (499, 500), (500, 499), (501, 499), (499, 501), (500, 501)]
         self.assertEqual(len(result), len(expected))
         self.assertListEqual(sorted(result), sorted(expected))
 
-    def test_calculateBonsTiles_perfectTile(self):
+    def test_calculateBonusTiles_perfectTile(self):
         """
         should do .. when ..
         """
