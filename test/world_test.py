@@ -1,6 +1,7 @@
 from unittest import TestCase
-from tile import Tile
+from tile import EdgeType, Tile
 from world import World
+from renderer import Renderer
 
 class WorldTest(TestCase):
     
@@ -53,15 +54,17 @@ class WorldTest(TestCase):
         """
         
         # Arrange
-        grasTile = Tile([1,0,0,0,0,0]) 
+        grasTile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras]) 
         world = World()
         
         
         # Act
-        positions = world.getAdjacentPositions(501, 501)
+        positions = world.getAdjacentPositions(500, 500)
         for pos in positions:
             world.insertTileAt(grasTile, pos)
 
         # Assert
-        self.assertEqual(world.remainingTiles, 45)
+        result = world.calculateBonusTiles(grasTile, 500, 500)
+        self.assertEqual(result, 1)
+        
         

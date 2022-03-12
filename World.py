@@ -1,4 +1,4 @@
-from tile import Tile
+from tile import Tile, EdgeType
 from typing import List, Set, Tuple
 
 class World:
@@ -11,7 +11,7 @@ class World:
         self.possiblePlacements: Set[(int, int)] = [] # Keeps track of the possible placement positions
 
         # Place first tile
-        self.map[World.CENTER[1]][World.CENTER[0]] = Tile([0, 0, 0, 0, 0, 0])
+        self.map[World.CENTER[1]][World.CENTER[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
         self.possiblePlacements = set(self.getAdjacentPositions(World.CENTER[0], World.CENTER[1]))
 
         self.remainingTiles: int = 40
@@ -84,11 +84,12 @@ class World:
         """
         count = 0
         positionsToCheck = self.getAdjacentPositions(x, y)
+        positionsToCheck.append((500, 500)) # Check the placed tile itself
         for pos in positionsToCheck:
             tileToCheck = self.getTileAt(pos)  
             if tileToCheck is not None:
                 adjacentTiles = self.getAdjacentTiles(pos[0], pos[1])
-                if adjacentTiles == 6: # Otherwise cannot be perfect
+                if len(adjacentTiles) == 6: # Otherwise cannot be perfect
                     score = self.calculateScore(tileToCheck, pos[0], pos[1])
                     if score == 60:
                         count += 1
