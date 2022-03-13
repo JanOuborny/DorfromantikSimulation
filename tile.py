@@ -1,6 +1,7 @@
 from enum import Enum
 from typing import List
 from random import randint
+from quest import Quest
 
 
 class EdgeType(Enum):
@@ -14,13 +15,15 @@ class EdgeType(Enum):
 
 class Tile:
 
-    def __init__(self, edges: List[EdgeType] = None) -> None:    
+    def __init__(self, edges: List[EdgeType] = None, quest: Quest = None) -> None:    
         if edges is not None:
             assert len(edges) == 6
             self.edges = edges # Clockwise, starting with Up-Right
         else:
             self.edges: List[EdgeType] = []
             self.randomizeEdges()
+        
+        self.quest = quest
 
     def randomizeEdges(self):
         enumOrder = len(list(EdgeType))

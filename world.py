@@ -1,4 +1,5 @@
 from tile import Tile, EdgeType
+from quest import Quest, QuestType
 from typing import List, Set, Tuple
 
 class World:
@@ -9,6 +10,7 @@ class World:
         # Y down notation
         self.map: List[List[Tile]] = [[None for j in range(World.MAX_SIZE)] for i in range(World.MAX_SIZE)]
         self.possiblePlacements: Set[(int, int)] = [] # Keeps track of the possible placement positions
+        self.quests: Set[Quest] = []
 
         # Place first tile
         self.map[World.CENTER[1]][World.CENTER[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
