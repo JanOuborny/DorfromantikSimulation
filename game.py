@@ -19,12 +19,12 @@ class Game:
     def getPossiblePlacements(self) -> List[Tuple[int, int]]:
         return self.world.getPossiblePlacements(self.currentTile)
 
-    def placeCurrentTile(self, x, y) -> bool:
+    def placeCurrentTileAt(self, pos) -> bool:
         """
         Places the current tile at the provided position.
         Returns a boolean indicating if the game is over.
         """
-        result = self.world.insertTile(self.currentTile, x, y)
+        result = self.world.insertTileAt(self.currentTile, pos)
         self.remainingTiles += (result[0] - 1)
         self.score += result[1]
         self.currentTile = Tile()

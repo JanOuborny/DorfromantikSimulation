@@ -5,20 +5,20 @@ from renderer import Renderer
 
 class WorldTest(TestCase):
     
-    def test_getAdjacentPositions(self):
+    def test_getAdjacentPositionsAt(self):
         """
         Should return the correct coordinates for adjacent positions  
         """ 
         # Arrange 
         world = World()
         # Act
-        result = world.getAdjacentPositions(2, 2)
+        result = world.getAdjacentPositionsAt((2, 2))
         expected = [(2, 1), (3, 1), (1,2), (3, 2), (1,3),(2,3)]
         # Assert
         self.assertEqual(len(result), len(expected))
         self.assertListEqual(sorted(result), sorted(expected))
         
-    def test_inserTile_invalidPosition(self):
+    def test_inserTileAt_invalidPosition(self):
         """
         Should raise an exception if an invalid position is passed
         """
@@ -26,7 +26,7 @@ class WorldTest(TestCase):
         world = World()
         tile = Tile([1,0,0,0,0,0])
         # Act & Assert
-        self.assertRaises(Exception, world.insertTile, tile, 5,5)
+        self.assertRaises(Exception, world.insertTileAt, tile, (5,5))
         
     def test_getPossiblePlacments_afterInit(self):
         """
@@ -42,7 +42,7 @@ class WorldTest(TestCase):
         self.assertEqual(len(result), len(expected))
         self.assertListEqual(sorted(result), sorted(expected))
 
-    def test_calculateBonusTiles_perfectTile(self):
+    def test_calculateBonusTilesAt_perfectTile(self):
         """
         Should return one bonus tile when enclosing a tile perfectly, i.e. matching edge types at each edge
         """
@@ -50,11 +50,23 @@ class WorldTest(TestCase):
         grasTile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras]) 
         world = World()
         # Act
-        positions = world.getAdjacentPositions(500, 500)
+        positions = world.getAdjacentPositionsAt(World.CENTER)
         for pos in positions:
             world.insertTileAt(grasTile, pos)
         # Assert
-        result = world.calculateBonusTiles(grasTile, 500, 500)
+        result = world.calculateBonusTilesAt(World.CENTER)
         self.assertEqual(result, 1)
+
+    def test_getAdjacentTilesAt_noAdjacentTiles(self):
+        """
+        Should return with six elements where each element is None
+        """
+        # Arrange
+        world = World()
+        # Act
+        result = world.getAdjacentTilesAt(World.CENTER)
+        # Assert
+        self.assertEqual(len(result), 6)
+        self.assertTrue(all(tile is None for tile in result))
         
         
