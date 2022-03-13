@@ -14,14 +14,13 @@ class World:
         self.map[World.CENTER[1]][World.CENTER[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
         self.possiblePlacements = set(self.getAdjacentPositions(World.CENTER[0], World.CENTER[1]))
 
-        self.remainingTiles: int = 40
-
     def insertTileAt(self, tile, pos: Tuple[int, int]) -> int:
         self.insertTile(tile, pos[0], pos[1])
 
-    def insertTile(self, tile, x, y) -> int:
+    def insertTile(self, tile, x, y) -> Tuple[int, int]:
         """
-        Inserts tile and returns score. 
+        Inserts tile. 
+        Returns a tuple containing in the first entry the bonus tiles and in the second entry the score. 
         Throws exception if insertion is not possible.
         """
         if self.map[y][x] is not None:
@@ -37,7 +36,9 @@ class World:
                 if self.map[y][x] is None:
                     self.possiblePlacements.add(pos)
 
-            return self.calculateScore(tile, x, y)
+            score = self.calculateScore(tile, x, y)
+            bonusTiles = self.calculateBonusTiles(tile, x, y)
+            return (bonusTiles, score)
         else:
             raise Exception(f"Invalid tile position at {(x,y)}")
         
