@@ -25,7 +25,7 @@ class MockWorldBig(World):
     MAX_SIZE = 50
 
     def __init__(self):
-        self.map = [[Tile([]).randomizeEdges() for i in range(MockWorldBig.MAX_SIZE)] for j in range(MockWorldBig.MAX_SIZE)]
+        self.map = [[Tile() for i in range(MockWorldBig.MAX_SIZE)] for j in range(MockWorldBig.MAX_SIZE)]
 
 class TestRenderer(TestCase):
     def test_renderSmall(self):
