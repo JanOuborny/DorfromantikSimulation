@@ -62,7 +62,6 @@ class Renderer:
                 center = Point(x + y / 2, y)
 
                 for edgeIndex, edge in enumerate(tile.edges):
-                    print(edge)
                     color = Renderer._edgeTypeToColor[edge]
                     Renderer._drawEdge(dwg, center, edgeIndex, color, label=f"({x}, {y})")
 
