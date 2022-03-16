@@ -61,17 +61,6 @@ class Renderer:
         for y, row in enumerate(self.world.map):
             for x, tile in enumerate(row):
                 if tile is not None:
-<<<<<<< HEAD
-                    # Add y/2 for shift in y-down coordinate system.
-                    center = Point(x + y / 2, y)
-
-                    for edgeIndex, edge in enumerate(tile.edges):
-                        print(f"Edge: {edge}")
-                        color = Renderer._edgeTypeToColor[edge]
-                        Renderer._drawEdge(dwg, center, edgeIndex, color, label=f"({x}, {y})")
-
-                    # Renderer._addLabel(dwg, str((x, y)), center)
-=======
                     # Add y/2 for shifting right.
                     center = Point(x + y / 2, y * Renderer._Y_OFFSET_FACTOR)
 
@@ -82,7 +71,6 @@ class Renderer:
                     if addLabels:
                         Renderer._addEdgeLabels(dwg, center)
                         Renderer._addCoordinateLabel(dwg, x, y, center)
->>>>>>> master
 
         dwg.save()
 
