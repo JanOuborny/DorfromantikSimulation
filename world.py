@@ -2,6 +2,7 @@ from tile import Tile, EdgeType
 from quest import Quest, QuestType
 from typing import List, Set, Tuple
 
+
 class World:
     MAX_SIZE = 1001
     CENTER = (500,500)
@@ -32,8 +33,18 @@ class World:
         adjacentPositions = self.getAdjacentPositionsAt(pos)
         if len(adjacentTiles) > 0:
             self.map[y][x] = tile
-            self.possiblePlacements.remove((x,y))
 
+            for adjTile in adjacentTiles:
+                for i in range(6):
+                    # The same area can be be attached to multiple edges. However, we only count its sizes once.
+                    if self.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and self.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)]:
+                        adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
+                        adjacentConnection.area.size += self.connections[i].area.size
+                        self.connections[i].area = adjacentConnection.area 
+
+            # Update possible placements
+            self.possiblePlacements.remove((x,y))
+            # Append new possible placements
             for adjPos in adjacentPositions:
                 if self.map[adjPos[1]][adjPos[0]] is None:
                     self.possiblePlacements.add(adjPos)
@@ -81,7 +92,7 @@ class World:
         for i in range(6):
             adjacentTile = self.getTileAt(adjacentPosition[i])
             if adjacentTile is not None:
-                if tile.edges[i] == adjacentTile.edges[(i+3) % 6]:
+                if tile.edges[i] == adjacentTile.edges[Tile.getIndexOfOppositeSide(i)]:
                     score += 10
         return score
 

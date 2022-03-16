@@ -2,7 +2,7 @@ from enum import Enum
 from typing import List
 from random import randint
 from quest import Quest
-
+from area import Area
 
 class EdgeType(Enum):
     Gras = 0
@@ -12,6 +12,11 @@ class EdgeType(Enum):
     Water = 4
     Train = 5
     WaterTrain = 6 # Omit first
+
+class TileConnection:
+
+    def __init__(self, area: Area) -> None:
+        self.area = area
 
 class Tile:
 
@@ -24,6 +29,16 @@ class Tile:
             self.randomizeEdges()
         
         self.quest = quest
+        self.connections: List[TileConnection] = [None for i in range(6)]  # Clockwise, starting with Up-Right
+   
+        for i in range(6):
+            if self.edges[i] != EdgeType.Gras and self.connections[i] is not None:
+                area = self.edges[i], randint(1, 2) # TODO vary size range by edge type
+                self.connections[i] = TileConnection(area) 
+
+                # All adjacent edges with the same type should have the same connection 
+                if self.edges[i] == self.edges[i+1]: 
+                    self.connections[i+1] = self.connections[i]
 
     def randomizeEdges(self):
         enumOrder = len(list(EdgeType))
@@ -32,6 +47,11 @@ class Tile:
 
         return self
 
+    def getIndexOfOppositeSide(index: int):
+        """
+        Returns the index of the opposite side of an given edge index
+        """
+        return (index+3) % 6
 
     def rotate(self, n):
         """
