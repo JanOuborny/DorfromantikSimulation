@@ -1,7 +1,6 @@
 from unittest import TestCase
 from tile import EdgeType, Tile
 from world import World
-from renderer import Renderer
 
 class WorldTest(TestCase):
     

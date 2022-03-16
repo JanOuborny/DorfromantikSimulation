@@ -1,6 +1,5 @@
-
 from enum import Enum
-from tile import EdgeType, Tile
+from tile import EdgeType
 from typing import Set, Tuple
 
 class QuestType(Enum):

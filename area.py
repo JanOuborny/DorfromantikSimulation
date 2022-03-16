@@ -1,5 +1,8 @@
 from typing import Set, Tuple
-from tile import EdgeType
+
+# To prevent a circular import
+class EdgeType:
+    pass
 
 class Area:
 
