@@ -4,18 +4,21 @@ from typing import List, Set, Tuple
 
 
 class World:
-    MAX_SIZE = 1001
-    CENTER = (500,500)
+    DEFAULT_SIZE = 1001
 
-    def __init__(self) -> None:
+    def __init__(self, size: int = DEFAULT_SIZE) -> None:
+        self.size = size
+        self.center = (round(self.size / 2), round(self.size / 2))
+
+
         # Y down notation
-        self.map: List[List[Tile]] = [[None for j in range(World.MAX_SIZE)] for i in range(World.MAX_SIZE)]
+        self.map: List[List[Tile]] = [[None for j in range(self.size)] for i in range(self.size)]
         self.possiblePlacements: Set[(int, int)] = [] # Keeps track of the possible placement positions
         self.quests: Set[Quest] = []
 
         # Place first tile
-        self.map[World.CENTER[1]][World.CENTER[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
-        self.possiblePlacements = set(self.getAdjacentPositionsAt(World.CENTER))
+        self.map[self.center[1]][self.center[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
+        self.possiblePlacements = set(self.getAdjacentPositionsAt(self.center))
 
     def insertTileAt(self, tile, pos: Tuple[int, int]) -> Tuple[int, int]:
         """
@@ -36,11 +39,15 @@ class World:
 
             for adjTile in adjacentTiles:
                 for i in range(6):
-                    # The same area can be be attached to multiple edges. However, we only count its sizes once.
-                    if self.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and self.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)]:
-                        adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
-                        adjacentConnection.area.size += self.connections[i].area.size
-                        self.connections[i].area = adjacentConnection.area 
+                    if adjTile is not None:
+                        # The same area can be be attached to multiple edges. However, we only count its sizes once.
+                        # We also ignore edges of type gras, because we ignore connection between gras edges.
+                        if (tile.edges[i] != EdgeType.Gras and
+                                tile.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and 
+                                tile.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)]):
+                            adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
+                            adjacentConnection.area.size += tile.connections[i].area.size
+                            tile.connections[i].area = adjacentConnection.area 
 
             # Update possible placements
             self.possiblePlacements.remove((x,y))

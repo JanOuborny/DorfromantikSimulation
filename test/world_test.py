@@ -49,11 +49,11 @@ class WorldTest(TestCase):
         grasTile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras]) 
         world = World()
         # Act
-        positions = world.getAdjacentPositionsAt(World.CENTER)
+        positions = world.getAdjacentPositionsAt(world.center)
         for pos in positions:
             world.insertTileAt(grasTile, pos)
         # Assert
-        result = world.calculateBonusTilesAt(World.CENTER)
+        result = world.calculateBonusTilesAt(world.center)
         self.assertEqual(result, 1)
 
     def test_getAdjacentTilesAt_noAdjacentTiles(self):
@@ -63,7 +63,7 @@ class WorldTest(TestCase):
         # Arrange
         world = World()
         # Act
-        result = world.getAdjacentTilesAt(World.CENTER)
+        result = world.getAdjacentTilesAt(world.center)
         # Assert
         self.assertEqual(len(result), 6)
         self.assertTrue(all(tile is None for tile in result))

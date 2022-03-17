@@ -1,6 +1,9 @@
 from enum import Enum
-from tile import EdgeType
 from typing import Set, Tuple
+
+# To prevent a circular import
+class EdgeType:
+    pass
 
 class QuestType(Enum):
     Atleast = 0
