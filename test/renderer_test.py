@@ -10,6 +10,7 @@ class MockWorldSmall(World):
     MAX_SIZE = 1
 
     def __init__(self):
+        self.size = MockWorldSmall.MAX_SIZE
         self.map = [
             [
                 Tile([
@@ -27,6 +28,7 @@ class MockWorldBig(World):
     MAX_SIZE = 50
 
     def __init__(self):
+        self.size = MockWorldBig.MAX_SIZE
         self.map = [[Tile() if random.random() < 0.6 else None for i in range(MockWorldBig.MAX_SIZE)] for j in range(MockWorldBig.MAX_SIZE)]
 
 class MockWorldFitting(World):
@@ -38,6 +40,7 @@ class MockWorldFitting(World):
             EdgeType.Houses if i in indices else EdgeType.Gras for i in range(6)
         ])
 
+        self.size = MockWorldFitting.MAX_SIZE
         self.map = [
             [T([1, 2]), T([4])],
             [T([5]), T([])]
