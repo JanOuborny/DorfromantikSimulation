@@ -6,8 +6,8 @@ from typing import List, Tuple
 
 class Game:
 
-    def __init__(self) -> None:
-        self.world = World()
+    def __init__(self, size = World.DEFAULT_SIZE) -> None:
+        self.world = World(size)
 
         self.remainingTiles: int = 40
         self.score: int = 0

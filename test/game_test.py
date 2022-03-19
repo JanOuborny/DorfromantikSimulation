@@ -13,7 +13,7 @@ class GameTest(TestCase):
         # Act
         positions = game.getPossiblePlacements()
         pos = positions[0]
-        gameOver = game.placeCurrentTile(pos[0],pos[1])
+        gameOver = game.placeCurrentTileAt(pos)
         # Assert
         self.assertTrue(gameOver)
 
@@ -27,6 +27,6 @@ class GameTest(TestCase):
         # Act
         positions = game.getPossiblePlacements()
         pos = positions[0]
-        gameOver = game.placeCurrentTile(pos[0],pos[1])
+        gameOver = game.placeCurrentTileAt(pos)
         # Assert
         self.assertFalse(gameOver)
