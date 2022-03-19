@@ -47,22 +47,24 @@ class Renderer:
     def __init__(self, world: World):
         self.world = world
 
-    def render(self, filename: str = 'render.svg', addLabels: bool = False):
+    def render(self, filename: str = 'render.svg', addLabels: bool = False, coordinateLabels: bool = False):
         assert filename.endswith('.svg'), "Suck my dickkkkkk"
 
         dwg = svgwrite.Drawing(
             filename=filename,
             profile='full',
             size=('30cm', '20cm'),
-            viewBox=(f'{-0.5} {-Renderer._TRIANGLE_SIDE_LENGTH} {1.5 * self.world.MAX_SIZE + 1.5} {self.world.MAX_SIZE + 1}'),
+            viewBox=(f'{-0.5} {-Renderer._TRIANGLE_SIDE_LENGTH} {1.5 * self.world.size + 1.5} {self.world.size + 1}'),
             style=Renderer.STYLE
         )
 
         for y, row in enumerate(self.world.map):
             for x, tile in enumerate(row):
+                center = Point(x + y / 2, y * Renderer._Y_OFFSET_FACTOR)             
+
                 if tile is not None:
                     # Add y/2 for shifting right.
-                    center = Point(x + y / 2, y * Renderer._Y_OFFSET_FACTOR)
+                    
 
                     for edgeIndex, edge in enumerate(tile.edges):
                         color = Renderer._edgeTypeToColor[edge]
@@ -70,7 +72,8 @@ class Renderer:
 
                     if addLabels:
                         Renderer._addEdgeLabels(dwg, center)
-                        Renderer._addCoordinateLabel(dwg, x, y, center)
+                if coordinateLabels:
+                    Renderer._addCoordinateLabel(dwg, x, y, center)                      
 
         dwg.save()
 
