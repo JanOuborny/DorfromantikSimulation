@@ -1,8 +1,10 @@
+from ast import Break
 from enum import Enum
 from typing import List
 from random import randint
 from quest import Quest
 from area import Area
+import queue
 
 class EdgeType(Enum):
     Gras = 0
@@ -14,12 +16,16 @@ class EdgeType(Enum):
     WaterTrain = 6 # Omit first
 
 class TileConnection:
-
+    """
+    Represents the interior connection of edges with the same type
+    """
     def __init__(self, area: Area) -> None:
         self.area = area
 
 class Tile:
-
+    """
+    Represents a tile in the game world
+    """
     def __init__(self, edges: List[EdgeType] = None, quest: Quest = None) -> None:    
         if edges is not None:
             assert len(edges) == 6
@@ -31,14 +37,35 @@ class Tile:
         self.quest = quest
         self.connections: List[TileConnection] = [None for i in range(6)]  # Clockwise, starting with Up-Right
    
-        for i in range(6):
-            if self.edges[i] != EdgeType.Gras and self.connections[i] is not None:
-                area = self.edges[i], randint(1, 2) # TODO vary size range by edge type
-                self.connections[i] = TileConnection(area) 
+        # Expand TileConnection of first tile by going counterclockwise around
+        j = 1
+        while self.connections[-j] is None:
+            if self.edges[0] == self.edges[-j]:
+                self.connections[0].area.size += 1
+                self.connections[-j] = self.connections[0]
+                j = (j + 1) % 6 
+            else:
+                break
+    
+        # Expand TileConnection of remaining tiles by going clockwise around.
+        q = queue.Queue()
+        q.put(0)
+        while not q.empty():
+            i = q.get()
 
-                # All adjacent edges with the same type should have the same connection 
-                if self.edges[i] == self.edges[i+1]: 
-                    self.connections[i+1] = self.connections[i]
+            if self.connections[i] is None:
+                area = Area(self.edges[i], 1) # TODO Implement area size
+                self.connections[i] = TileConnection(area)
+
+            j = (i + 1) % 6
+            while self.connections[j] is None:
+                if self.edges[i] == self.edges[j]:
+                    self.connections[i].area.size += 1
+                    self.connections[j] = self.connections[i] 
+                else:
+                    q.put(j)
+                    break
+                j = (j + 1) % 6
 
     def randomizeEdges(self):
         enumOrder = len(list(EdgeType))

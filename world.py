@@ -2,19 +2,21 @@ from tile import Tile, EdgeType
 from quest import Quest, QuestType
 from typing import List, Set, Tuple
 
+class WorldException(Exception):
+    pass
 
 class World:
     DEFAULT_SIZE = 1001
 
     def __init__(self, size: int = DEFAULT_SIZE) -> None:
         self.size = size
-        self.center = (round(self.size / 2), round(self.size / 2))
+        self.center = (round((self.size-1) / 2), round((self.size-1) / 2))
 
 
         # Y down notation
         self.map: List[List[Tile]] = [[None for j in range(self.size)] for i in range(self.size)]
-        self.possiblePlacements: Set[(int, int)] = [] # Keeps track of the possible placement positions
-        self.quests: Set[Quest] = []
+        self.possiblePlacements: Set[(int, int)] = {} # Keeps track of the possible placement positions
+        self.quests: Set[Quest] = {}
 
         # Place first tile
         self.map[self.center[1]][self.center[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
@@ -30,21 +32,22 @@ class World:
         y = pos[1]
 
         if self.map[y][x] is not None:
-            raise Exception(f"Invalid tile position at {pos}")
+            raise WorldException(f"Invalid tile position at {pos}: Position is occupied.")
+        if pos not in self.possiblePlacements:
+            raise WorldException(f"Invalid tile position at {pos}: Disconnected from remaining tiles.")
         
         adjacentTiles = self.getAdjacentTilesAt(pos)
         adjacentPositions = self.getAdjacentPositionsAt(pos)
         if len(adjacentTiles) > 0:
             self.map[y][x] = tile
 
+            # Update tile connections
             for adjTile in adjacentTiles:
                 for i in range(6):
                     if adjTile is not None:
                         # The same area can be be attached to multiple edges. However, we only count its sizes once.
-                        # We also ignore edges of type gras, because we ignore connection between gras edges.
-                        if (tile.edges[i] != EdgeType.Gras and
-                                tile.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and 
-                                tile.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)]):
+                        if (tile.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and 
+                                tile.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)].area):
                             adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
                             adjacentConnection.area.size += tile.connections[i].area.size
                             tile.connections[i].area = adjacentConnection.area 
