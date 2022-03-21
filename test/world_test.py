@@ -1,6 +1,7 @@
 from unittest import TestCase
 from tile import EdgeType, Tile
-from world import World
+from world import World, WorldException
+from quest import Quest, QuestType
 
 class WorldTest(TestCase):
     
@@ -17,15 +18,60 @@ class WorldTest(TestCase):
         self.assertEqual(len(result), len(expected))
         self.assertListEqual(sorted(result), sorted(expected))
         
-    def test_inserTileAt_invalidPosition(self):
+    def test_inserTileAt_disconnectedPosition(self):
         """
         Should raise an exception if an invalid position is passed
         """
         # Arrange
-        world = World()
+        world = World(10)
         tile = Tile([1,0,0,0,0,0])
         # Act & Assert
-        self.assertRaises(Exception, world.insertTileAt, tile, (5,5))
+        self.assertRaises(WorldException, world.insertTileAt, tile, (0,0))
+
+    def test_insertTileAt_updateTileConnections(self):
+        """
+        should do .. when ..
+        """     
+        # Arrange
+        world = World(10)
+        tile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras])
+        # Act
+        world.insertTileAt(tile, world.getPossiblePlacements(tile)[0])
+        # Assert
+        center = world.getTileAt(world.center)
+        for connection in tile.connections:
+            for centerCon in center.connections:
+                self.assertEquals(connection.area, centerCon.area)
+        
+    def test_insertTileAt_updateQuestArea(self):
+        """
+        Should update the quest area of the inserted tile
+        """
+        
+        # Arrange
+        world = World(10)
+        tile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras])
+        tile.quest = Quest(QuestType.Atleast, EdgeType.Gras, 100)
+        # Act
+        world.insertTileAt(tile, world.getPossiblePlacements(tile)[0])
+        # Assert
+        centerTile = world.getTileAt(world.center)
+        self.assertEquals(centerTile.connections[0].area, tile.quest.area)
+
+    def test_insertTileAt_questCompleted(self):
+        """
+        Should return the correct number of rewarded tiles and the completed quest is removed from the quest set
+        """
+        # Arrange
+        world = World(10)
+        tile = Tile([EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras,EdgeType.Gras])
+        tile.quest = Quest(QuestType.Exact, EdgeType.Gras, 12)
+        # Act
+        result = world.insertTileAt(tile, world.getPossiblePlacements(tile)[0])
+        # Assert
+        self.assertEqual(result[0], 5)
+        self.assertTrue(len(world.quests) == 0)
+        
         
     def test_getPossiblePlacments_afterInit(self):
         """

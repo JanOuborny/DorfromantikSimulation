@@ -1,3 +1,4 @@
+import queue
 from tile import Tile, EdgeType
 from quest import Quest, QuestType
 from typing import List, Set, Tuple
@@ -11,12 +12,12 @@ class World:
     def __init__(self, size: int = DEFAULT_SIZE) -> None:
         self.size = size
         self.center = (round((self.size-1) / 2), round((self.size-1) / 2))
-
+        self.quests: Set[Quest] = set()
 
         # Y down notation
         self.map: List[List[Tile]] = [[None for j in range(self.size)] for i in range(self.size)]
-        self.possiblePlacements: Set[(int, int)] = {} # Keeps track of the possible placement positions
-        self.quests: Set[Quest] = {}
+        self.possiblePlacements: Set[(int, int)] = set() # Keeps track of the possible placement positions
+        
 
         # Place first tile
         self.map[self.center[1]][self.center[0]] = Tile([EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras, EdgeType.Gras])
@@ -25,7 +26,7 @@ class World:
     def insertTileAt(self, tile, pos: Tuple[int, int]) -> Tuple[int, int]:
         """
         Inserts tile. 
-        Returns a tuple containing in the first entry the bonus tiles and in the second entry the score. 
+        Returns a tuple containing in the first entry the rewarded tiles and in the second entry the score. 
         Throws exception if insertion is not possible.
         """
         x = pos[0]
@@ -33,37 +34,44 @@ class World:
 
         if self.map[y][x] is not None:
             raise WorldException(f"Invalid tile position at {pos}: Position is occupied.")
-        if pos not in self.possiblePlacements:
+        if pos not in self.possiblePlacements: # This may become inefficent when the set of possible placements becomes very large
             raise WorldException(f"Invalid tile position at {pos}: Disconnected from remaining tiles.")
         
+        self.map[y][x] = tile
+
         adjacentTiles = self.getAdjacentTilesAt(pos)
         adjacentPositions = self.getAdjacentPositionsAt(pos)
-        if len(adjacentTiles) > 0:
-            self.map[y][x] = tile
 
-            # Update tile connections
-            for adjTile in adjacentTiles:
-                for i in range(6):
-                    if adjTile is not None:
-                        # The same area can be be attached to multiple edges. However, we only count its sizes once.
-                        if (tile.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and 
-                                tile.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)].area):
-                            adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
-                            adjacentConnection.area.size += tile.connections[i].area.size
-                            tile.connections[i].area = adjacentConnection.area 
+ 
+        # Update tile connections
+        for adjTile in adjacentTiles:
+            for i in range(6):
+                if adjTile is not None:
+                    # The same area can be be attached to multiple edges. However, we only count its sizes once.
+                    if (tile.edges[i] == adjTile.edges[Tile.getIndexOfOppositeSide(i)] and 
+                            tile.connections[i].area != adjTile.connections[Tile.getIndexOfOppositeSide(i)].area):
+                        adjacentConnection = adjTile.connections[Tile.getIndexOfOppositeSide(i)]
+                        adjacentConnection.area.size += tile.connections[i].area.size
+                        tile.connections[i].area = adjacentConnection.area 
 
-            # Update possible placements
-            self.possiblePlacements.remove((x,y))
-            # Append new possible placements
-            for adjPos in adjacentPositions:
-                if self.map[adjPos[1]][adjPos[0]] is None:
-                    self.possiblePlacements.add(adjPos)
+        # Set the quest area to the adjacent 
+        if tile.quest is not None:
+            index = next(i for i,e in enumerate(tile.edges) if e == tile.quest.edgeType)
+            tile.quest.area = tile.connections[index].area
+            self.quests.add(tile.quest)
 
-            score = self.calculateScoreAt(tile, pos)
-            bonusTiles = self.calculateBonusTilesAt(pos)
-            return (bonusTiles, score)
-        else:
-            raise Exception(f"Invalid tile position at {pos}")
+        rewardedTiles = self.updateQuests()
+
+        # Update possible placements
+        self.possiblePlacements.remove((x,y))
+        # Append new possible placements
+        for adjPos in adjacentPositions:
+            if self.map[adjPos[1]][adjPos[0]] is None:
+                self.possiblePlacements.add(adjPos)
+
+        score = self.calculateScoreAt(tile, pos)
+        bonusTiles = self.calculateBonusTilesAt(pos)
+        return (bonusTiles + rewardedTiles, score)
         
     def getPossiblePlacements(self, tile) -> List[Tuple[int, int]]:
         # TODO filter tiles which doesnt match, i.e. river and train tiles
@@ -128,3 +136,24 @@ class World:
     def getTileAt(self, pos):
         return self.map[pos[1]][pos[0]]
     
+    def updateQuests(self) -> int:
+        """
+        Checks for completed or failed quets and updates the open quest set.
+        Returns the rewarded tiles for completed quests.
+        """
+        rewardedTiles = 0
+        completedQuests = set()
+        for quest in self.quests:
+            if quest.type == QuestType.Atleast:
+                if quest.area.size >= quest.goal:
+                    rewardedTiles += quest.reward
+                    completedQuests.add(quest)
+            elif quest.type == QuestType.Exact:
+                if quest.area.size == quest.goal:
+                    rewardedTiles += quest.reward
+                    completedQuests.add(quest)
+                elif quest.area.size > quest.goal:
+                    # Quest failed
+                    completedQuests.add(quest)
+        self.quests = self.quests.difference(completedQuests)
+        return rewardedTiles

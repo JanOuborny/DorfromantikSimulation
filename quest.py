@@ -4,6 +4,8 @@ from typing import Set, Tuple
 # To prevent a circular import
 class EdgeType:
     pass
+class Area:
+    pass
 
 class QuestType(Enum):
     Atleast = 0
@@ -17,5 +19,4 @@ class Quest:
         self.edgeType = edgeType
         self.reward = 5
         self.goal = goal
-
-        self._area: Set[Tuple[int, int]] = Set()
+        self.area: Area = None

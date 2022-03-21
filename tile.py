@@ -33,12 +33,40 @@ class Tile:
         else:
             self.edges: List[EdgeType] = []
             self.randomizeEdges()
-        
-        self.quest = quest
+
         self.connections: List[TileConnection] = [None for i in range(6)]  # Clockwise, starting with Up-Right
-   
+        self._initTileConnections()
+
+        self.quest = quest
+        # TODO Assert that the edges of the quest's type are all connected
+
+    def randomizeEdges(self):
+        enumOrder = len(list(EdgeType))
+        for i in range(6):
+            self.edges.append(EdgeType(randint(0, enumOrder - 1)))
+
+        return self
+
+    def getIndexOfOppositeSide(index: int):
+        """
+        Returns the index of the opposite side of an given edge index
+        """
+        return (index+3) % 6
+
+    def rotate(self, n):
+        """
+        Rotates edge types clockwise by n
+        """
+        newEdges = []
+        for i in range(6):
+            newEdges.append(self.edges[i - (-n % 6)])
+
+        self.edges = newEdges
+
+    def _initTileConnections(self):
         # Expand TileConnection of first tile by going counterclockwise around
         j = 1
+        self.connections[0] = TileConnection(Area(self.edges[0], 1))
         while self.connections[-j] is None:
             if self.edges[0] == self.edges[-j]:
                 self.connections[0].area.size += 1
@@ -66,26 +94,3 @@ class Tile:
                     q.put(j)
                     break
                 j = (j + 1) % 6
-
-    def randomizeEdges(self):
-        enumOrder = len(list(EdgeType))
-        for i in range(6):
-            self.edges.append(EdgeType(randint(0, enumOrder - 1)))
-
-        return self
-
-    def getIndexOfOppositeSide(index: int):
-        """
-        Returns the index of the opposite side of an given edge index
-        """
-        return (index+3) % 6
-
-    def rotate(self, n):
-        """
-        Rotates edge types clockwise by n
-        """
-        newEdges = []
-        for i in range(6):
-            newEdges.append(self.edges[i - (-n % 6)])
-
-        self.edges = newEdges
