@@ -60,7 +60,7 @@ class World:
             tile.quest.area = tile.connections[index].area
             self.quests.add(tile.quest)
 
-        rewardedTiles = self.updateQuests()
+        rewardedTiles = self._updateQuests()
 
         # Update possible placements
         self.possiblePlacements.remove((x,y))
@@ -136,7 +136,7 @@ class World:
     def getTileAt(self, pos):
         return self.map[pos[1]][pos[0]]
     
-    def updateQuests(self) -> int:
+    def _updateQuests(self) -> int:
         """
         Checks for completed or failed quets and updates the open quest set.
         Returns the rewarded tiles for completed quests.
