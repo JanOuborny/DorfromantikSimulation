@@ -19,13 +19,13 @@ class Game:
     def getPossiblePlacements(self) -> List[Tuple[int, int]]:
         return self.world.getPossiblePlacements(self.currentTile)
 
-    def getAdjacentTilesAt(self, pos) -> List[Tile]:
+    def getAdjacentTilesAt(self, pos: Tuple[int, int]) -> List[Tile]:
         """
         Returns the adjacent tiles in the hexagonal grid. In clockwise order, starting with Up-Right
         """
         return self.world.getAdjacentTilesAt(pos)
 
-    def placeCurrentTileAt(self, pos) -> bool:
+    def placeCurrentTileAt(self, pos: Tuple[int, int]) -> bool:
         """
         Places the current tile at the provided position.
         Returns a boolean indicating if the game is over.
