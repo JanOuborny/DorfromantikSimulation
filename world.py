@@ -42,6 +42,16 @@ class World:
         adjacentTiles = self.getAdjacentTilesAt(pos)
         adjacentPositions = self.getAdjacentPositionsAt(pos)
 
+        # Check if the tile matches, i.e. water and train tiles are aligned.
+        tileMatches = True
+        if EdgeType.Train in tile.edges or EdgeType.Water in tile.edges:
+            for i in range(6):
+                if self.edges[i] == EdgeType.Train or self.edges[i] == EdgeType.Water:
+                    if self.edges[i] != tile.edges[i]:
+                        tileMatches = False
+                        break 
+        if not tileMatches:
+            raise WorldException(f"Invalid tile position at {pos}: Water or train edges don't align.")
  
         # Update tile connections
         for adjTile in adjacentTiles:
@@ -74,7 +84,10 @@ class World:
         return (bonusTiles + rewardedTiles, score)
         
     def getPossiblePlacements(self, tile) -> List[Tuple[int, int]]:
-        # TODO filter tiles which doesnt match, i.e. river and train tiles
+        """
+        Returns the positions on the map where a tile can be possiblz placed.
+        This can include positions where the current tile cannot be placed, because the edge types don't match.
+        """
         return list(self.possiblePlacements)
 
     def getAdjacentTilesAt(self, pos: Tuple[int, int]) -> List[Tile]:
