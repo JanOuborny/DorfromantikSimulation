@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+
+<html>
+    <body>
+        <object id="map" type="image/svg+xml" data="http://localhost:8000/state" class="logo">
+    
+        </object>
+        <input id="position" type="text" style="position: absolute; bottom: 0; left: 0">
+        <script>
+            input = document.getElementById("position")
+            input.addEventListener("keyup", function(event) {
+                // Number 13 is the "Enter" key on the keyboard
+                console.log("keypressed")
+                if (event.keyCode === 13) {
+                    inputVal = input.value
+                    const regExpr  = /\d/g
+                    coords = [...inputVal.matchAll(regExpr)]
+                    console.log("Coords: " + coords[0] + " " + coords[1])
+
+                    const xhttp = new XMLHttpRequest();
+                    xhttp.onreadystatechange = function() {
+                        if (this.readyState == 4) {
+                            location.reload();
+                        }
+                    };
+                    xhttp.open("GET", `http://localhost:8000/insert?x=${coords[0]}&y=${coords[1]}`, true);
+                    xhttp.send()
+                }
+            });
+        </script>
+    </body>
+</html>
