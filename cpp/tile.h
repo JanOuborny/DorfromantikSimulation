@@ -6,7 +6,6 @@ const int c_tile_size = 6;
 class Tile {
     public:
         Tile();
-        Tile(int seed);
 
         int edges [c_tile_size];
         int getIndexOfOppositeSide(int index);
