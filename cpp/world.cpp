@@ -3,8 +3,12 @@
 
 World::World() {
     _size = 100;
-
-    _map = 
+    _map = std::vector<std::vector<Tile>>;
+    _map.reserve(_size);
+    for (int i = 0; i < _size; i++) {
+        std::vector<Tile> *row = row_map.at(i);
+        row->reserve(_size);
+    }
 }
 
 // std::vector<position> World::getAdjacentPositionsAt(position position) {
@@ -18,3 +22,8 @@ World::World() {
 //     result.append((x-1, y)) // Left
 //     result.append((x, y-1)) // Up Left
 // }
+
+Tile* World::getTileAt(position *position) {
+    std::vector<Tile> *row = _map.at(position.y);
+    row->.at
+}
